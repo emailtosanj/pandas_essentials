@@ -1,0 +1,117 @@
+
+
+
+#DataFrame - df-(group by cols -> user_id / business_id count and sum it)
+df.groupby(['user_id', 'business_id']).count()['stars'].sum()
+
+#Type of attribute and the row count in the total no. of records dataset.
+data['business_id'].value_counts()
+
+#To get mean star ratings of a business id
+data.groupby('business_id')['stars']. mean()
+
+# Finding restautants with minimum number of interactions
+recommendations = data[data['rating_count'] > min_interaction]
+
+# Sorting values with respect to average rating
+recommendations = recommendations.sort_values(by = 'avg_rating', ascending = False)
+
+# remove records from a df which has user id in a given list/array
+df_final = data.loc[ ~ data.user_id.isin(remove_users)]
+
+
+
+##### update index of a data frame ######
+
+    You can easily change the index of a pandas DataFrame to another column using the `set_index()` method. This is a very common operation in data analysis for tasks like:
+
+      * **Making a meaningful identifier:** If you have an ID column (e.g., `CustomerID`, `OrderID`, `Date`), setting it as the index allows for more intuitive data access and alignment.
+      * **Hierarchical indexing (MultiIndex):** You can set multiple columns as the index to create a hierarchical index.
+      * **Preparation for merging/joining:** Often, merge operations are more efficient or intuitive when performed on aligned indices.
+
+    Here's how to do it:
+
+    ### Using `df.set_index()`
+
+    The `set_index()` method is the primary way to change the index.
+
+    ```python
+    import pandas as pd
+
+    # Create a sample DataFrame
+    data = {
+        'ID': [1, 2, 3, 4],
+        'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+        'City': ['New York', 'London', 'Paris', 'Tokyo'],
+        'Age': [25, 30, 35, 40]
+    }
+    df = pd.DataFrame(data)
+
+    print("Original DataFrame:")
+    print(df)
+    print("\nOriginal Index:", df.index)
+
+    # Change the index to the 'ID' column
+    # By default, drop=True, meaning the 'ID' column will be removed from the DataFrame columns
+    df_indexed_by_id = df.set_index('ID')
+
+    print("\nDataFrame with 'ID' as index (default behavior):")
+    print(df_indexed_by_id)
+    print("\nNew Index:", df_indexed_by_id.index)
+
+    # Change the index to 'Name', but keep 'Name' as a regular column as well
+    df_indexed_by_name_keep_col = df.set_index('Name', drop=False)
+
+    print("\nDataFrame with 'Name' as index (keeping 'Name' column):")
+    print(df_indexed_by_name_keep_col)
+
+    # To modify the DataFrame in place (without creating a new one)
+    # Use inplace=True (note: this modifies df directly, so print df after)
+    df.set_index('City', inplace=True)
+
+    print("\nOriginal DataFrame modified in place with 'City' as index:")
+    print(df)
+    ```
+
+    **Explanation of Parameters:**
+
+      * **`keys`**: This is the most important parameter. It can be:
+          * A **single column name (string)**: `df.set_index('ColumnName')`
+          * A **list of column names**: `df.set_index(['Column1', 'Column2'])` to create a MultiIndex (hierarchical index).
+      * **`drop` (boolean, default `True`)**:
+          * If `True`, the column(s) used to create the new index will be removed from the DataFrame's regular columns. This is the default.
+          * If `False`, the column(s) will be retained as regular columns *in addition* to becoming the index.
+      * **`inplace` (boolean, default `False`)**:
+          * If `False`, `set_index()` returns a *new* DataFrame with the updated index, leaving the original DataFrame unchanged.
+          * If `True`, `set_index()` modifies the DataFrame *in place* and returns `None`. Use this with caution, as it directly alters your DataFrame.
+      * **`append` (boolean, default `False`)**: If `True`, the new index will be appended to the existing index, creating a MultiIndex. This is useful if you already have an index and want to add another level.
+
+    ### Handling the Old Index
+
+    When you use `set_index()`, what happens to the *old* index?
+
+      * If your DataFrame had the default integer index (0, 1, 2, ...), it's simply replaced and usually discarded.
+      * If your DataFrame had a custom index, that index is replaced by the new one. If you later need the old index values as a regular column, you'd typically use `reset_index()` *before* setting the new index, or save the old index to a new column explicitly: `df['old_index_col'] = df.index`.
+
+    ### Example of MultiIndex (setting multiple columns as index)
+
+    ```python
+    import pandas as pd
+
+    df_products = pd.DataFrame({
+        'Category': ['Electronics', 'Electronics', 'Clothing', 'Clothing'],
+        'Product': ['Laptop', 'Mouse', 'Shirt', 'Jeans'],
+        'Price': [1200, 25, 45, 60]
+    })
+
+    print("Original Products DataFrame:")
+    print(df_products)
+
+    # Set 'Category' and 'Product' as a multi-level index
+    df_multi_indexed = df_products.set_index(['Category', 'Product'])
+
+    print("\nDataFrame with MultiIndex (Category, Product):")
+    print(df_multi_indexed)
+    ```
+
+##### end - update index of a data frame ######

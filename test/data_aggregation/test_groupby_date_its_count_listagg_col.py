@@ -1,0 +1,25 @@
+from unittest import TestCase
+
+import pandas as pd
+from pandas.testing import assert_frame_equal
+from data_aggregation.groupby_date_its_count_listagg_col import categorize_products
+
+
+class Test(TestCase):
+    def test_categorize_products(self):
+        data = [['2020-05-30', 'Headphone'], ['2020-06-01', 'Pencil'], ['2020-06-02', 'Mask'],
+                ['2020-05-30', 'Basketball'], ['2020-06-01', 'Bible'], ['2020-06-02', 'Mask'],
+                ['2020-05-30', 'T-Shirt']]
+        activities = pd.DataFrame(data, columns=['sell_date', 'product']).astype(
+            {'sell_date': 'datetime64[ns]', 'product': 'object'})
+
+        dfa = categorize_products(activities)
+        dat = [['2020-05-30', 3, 'Basketball,Headphone,T-Shirt'],
+        ['2020-06-01', 2, 'Bible,Pencil'],
+        ['2020-06-02', 1, 'Mask']]
+
+        dfe = pd.DataFrame(data=dat, columns=['sell_date', 'num_sold', 'products']).astype(
+            {'sell_date': 'datetime64[ns]', 'num_sold':'int64'})
+
+        print(dfa)
+        assert_frame_equal(dfa, dfe)

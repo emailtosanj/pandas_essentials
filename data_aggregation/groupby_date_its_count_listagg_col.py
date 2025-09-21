@@ -58,9 +58,11 @@ def categorize_products(activities: pd.DataFrame) -> pd.DataFrame:
                                                     products=('product', lambda x: ','.join(sorted(x.unique())))).reset_index()
 
 
+
 '''
-result = df.groupby('key_column').agg(
-    combined_varchar=('varchar_column', lambda x: ', '.join(x.unique())),
-    row_count=('key_column', 'size')
-).reset_index()
+select to_char(sell_date, 'YYYY-MM-DD') as sell_date, count(sell_date) as num_sold ,
+LISTAGG(product, ',') WITHIN GROUP (ORDER BY product) AS products
+from (select distinct sell_date, product from Activities) 
+group by sell_date    
 '''
+
